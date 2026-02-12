@@ -143,6 +143,10 @@
     <string name="disable_bt_contact_share">Disable bluetooth contact sharing</string>
     <string name="common_criteria_mode">Common criteria mode</string>
     <string name="enable_usb_signal">Enable USB signal</string>
+    <string name="stay_on_while_plugged_in">Stay on while plugged in</string>
+    <string name="enable_adb">Enable ADB</string>
+    <string name="enable_usb_mass_storage">Enable USB mass storage</string>
+    <string name="skip_first_use_hints">Skip first use hints</string>
     <string name="keyguard">Keyguard</string>
     <string name="lock_now">Lock screen now</string>
     <string name="lock_screen">Lock screen</string>
@@ -158,6 +162,7 @@
     <string name="active">Active</string>
     <string name="total">Total</string>
     <string name="fan_speeds">Fan speeds</string>
+    <string name="default_input_method">Default input method</string>
     <string name="bug_report">Bug report</string>
     <string name="confirm_bug_report">Request bug report?</string>
     <string name="reboot">Reboot</string>

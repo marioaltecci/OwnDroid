@@ -101,6 +101,8 @@ import com.bintianqi.owndroid.dpm.CrossProfileIntentFilter
 import com.bintianqi.owndroid.dpm.CrossProfileIntentFilterScreen
 import com.bintianqi.owndroid.dpm.CrossProfilePackages
 import com.bintianqi.owndroid.dpm.CrossProfileWidgetProviders
+import com.bintianqi.owndroid.dpm.DefaultInputMethod
+import com.bintianqi.owndroid.dpm.DefaultInputMethodScreen
 import com.bintianqi.owndroid.dpm.DelegatedAdmins
 import com.bintianqi.owndroid.dpm.DelegatedAdminsScreen
 import com.bintianqi.owndroid.dpm.DeleteWorkProfile
@@ -362,6 +364,10 @@ fun Home(vm: MyViewModel, onLock: () -> Unit) {
         composable<HardwareMonitor> {
             HardwareMonitorScreen(vm.hardwareProperties, vm::getHardwareProperties,
                 vm::setHpRefreshInterval, ::navigateUp)
+        }
+        composable<DefaultInputMethod> {
+            DefaultInputMethodScreen(vm::getCurrentInputMethod, vm.inputMethodList,
+                vm::getInputMethods, vm::setDefaultInputMethod, ::navigateUp)
         }
         composable<ChangeTime> { ChangeTimeScreen(vm::setTime, ::navigateUp) }
         composable<ChangeTimeZone> { ChangeTimeZoneScreen(vm::setTimeZone, ::navigateUp) }

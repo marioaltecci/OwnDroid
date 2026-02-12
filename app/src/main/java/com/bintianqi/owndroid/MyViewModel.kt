@@ -45,7 +45,9 @@ import android.os.Bundle
 import android.os.HardwarePropertiesManager
 import android.os.UserHandle
 import android.os.UserManager
+import android.provider.Settings
 import android.telephony.data.ApnSetting
+import android.view.inputmethod.InputMethodManager
 import androidx.annotation.RequiresApi
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
@@ -103,10 +105,12 @@ import com.bintianqi.owndroid.dpm.activateOrgProfileCommand
 import com.bintianqi.owndroid.dpm.delegatedScopesList
 import com.bintianqi.owndroid.dpm.doUserOperationWithContext
 import com.bintianqi.owndroid.dpm.getPackageInstaller
+import com.bintianqi.owndroid.dpm.globalSettings
 import com.bintianqi.owndroid.dpm.handlePrivilegeChange
 import com.bintianqi.owndroid.dpm.isValidPackageName
 import com.bintianqi.owndroid.dpm.parsePackageInstallerMessage
 import com.bintianqi.owndroid.dpm.runtimePermissions
+import com.bintianqi.owndroid.dpm.secureSettings
 import com.bintianqi.owndroid.dpm.temperatureTypes
 import com.rosan.dhizuku.api.Dhizuku
 import com.rosan.dhizuku.api.DhizukuRequestPermissionListener
@@ -717,7 +721,9 @@ class MyViewModel(application: Application): AndroidViewModel(application) {
             commonCriteriaMode = if (VERSION.SDK_INT >= 30 && (privilege.device || privilege.org))
                 DPM.isCommonCriteriaModeEnabled(DAR) else false,
             usbSignalEnabled = if (VERSION.SDK_INT >= 31) DPM.isUsbDataSignalingEnabled else false,
-            canDisableUsbSignal = if (VERSION.SDK_INT >= 31) DPM.canUsbDataSignalingBeDisabled() else false
+            canDisableUsbSignal = if (VERSION.SDK_INT >= 31) DPM.canUsbDataSignalingBeDisabled() else false,
+            stayOnWhilePluggedIn = Settings.Global.getInt(
+                application.contentResolver, Settings.Global.STAY_ON_WHILE_PLUGGED_IN) != 0
         )
     }
     fun setCameraDisabled(disabled: Boolean) {
@@ -782,6 +788,28 @@ class MyViewModel(application: Application): AndroidViewModel(application) {
         DPM.isUsbDataSignalingEnabled = enabled
         systemOptionsStatus.update { it.copy(usbSignalEnabled = DPM.isUsbDataSignalingEnabled) }
     }
+    fun setStayOnWhilePluggedIn(status: Boolean) {
+        DPM.setGlobalSetting(
+            DAR, Settings.Global.STAY_ON_WHILE_PLUGGED_IN, if (status) "15" else "0"
+        )
+        systemOptionsStatus.update { it.copy(stayOnWhilePluggedIn = status) }
+    }
+    fun getGlobalSettings(): Map<String, Boolean> {
+        return globalSettings.associate {
+            it.setting to (Settings.Global.getInt(application.contentResolver, it.setting, 0) == 1)
+        }
+    }
+    fun setGlobalSetting(name: String, status: Boolean) {
+        DPM.setGlobalSetting(DAR, name, if (status) "1" else "0")
+    }
+    fun getSecureSettings(): Map<String, Boolean> {
+        return secureSettings.associate {
+            it.setting to (Settings.Secure.getInt(application.contentResolver, it.setting, 0) == 1)
+        }
+    }
+    fun setSecureSetting(name: String, status: Boolean) {
+        DPM.setSecureSetting(DAR, name, if (status) "1" else "0")
+    }
     fun setKeyguardDisabled(disabled: Boolean): Boolean {
         return DPM.setKeyguardDisabled(DAR, disabled)
     }
@@ -815,6 +843,21 @@ class MyViewModel(application: Application): AndroidViewModel(application) {
             hardwareProperties.value = properties
             delay(hpRefreshInterval)
         }
+    }
+    fun getCurrentInputMethod(): String {
+        return Settings.Secure.getString(
+            application.contentResolver, Settings.Secure.DEFAULT_INPUT_METHOD)
+    }
+    val inputMethodList = MutableStateFlow(listOf<Pair<String, AppInfo>>())
+    fun getInputMethods() {
+        val imm = application.getSystemService(InputMethodManager::class.java)
+        inputMethodList.value = imm.inputMethodList.map {
+            it.id to getAppInfo(it.packageName)
+        }
+    }
+    fun setDefaultInputMethod(id: String) {
+        DPM.setSecureSetting(DAR, Settings.Secure.DEFAULT_INPUT_METHOD, id)
+        getCurrentInputMethod()
     }
     @RequiresApi(28)
     fun setTime(time: Long, useCurrentTz: Boolean): Boolean {
