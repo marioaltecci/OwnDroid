@@ -357,8 +357,10 @@ fun SystemOptionsScreen(vm: MyViewModel, onNavigateUp: () -> Unit) {
     val secureSettingsStatus = remember { mutableStateMapOf<String, Boolean>() }
     LaunchedEffect(Unit) {
         vm.getSystemOptionsStatus()
-        globalSettingsStatus.putAll(vm.getGlobalSettings())
-        secureSettingsStatus.putAll(vm.getSecureSettings())
+        if (privilege.device) {
+            globalSettingsStatus.putAll(vm.getGlobalSettings())
+            secureSettingsStatus.putAll(vm.getSecureSettings())
+        }
     }
     MyScaffold(R.string.options, onNavigateUp, 0.dp) {
         SwitchItem(R.string.disable_cam, status.cameraDisabled, vm::setCameraDisabled,
@@ -403,21 +405,25 @@ fun SystemOptionsScreen(vm: MyViewModel, onNavigateUp: () -> Unit) {
         }
         SwitchItem(R.string.stay_on_while_plugged_in, status.stayOnWhilePluggedIn,
             vm::setStayOnWhilePluggedIn, R.drawable.mobile_phone_fill0)
-        globalSettings.forEach {
-            SwitchItem(it.name, globalSettingsStatus[it.setting] ?: false, { state ->
-                vm.setGlobalSetting(it.setting, state)
-                globalSettingsStatus[it.setting] = state
-            }, it.icon)
-        }
-        secureSettings.forEach {
-            SwitchItem(it.name, secureSettingsStatus[it.setting] ?: false, { state ->
-                vm.setSecureSetting(it.setting, state)
-                secureSettingsStatus[it.setting] = state
-            }, it.icon)
+        if (privilege.device) {
+            globalSettings.forEach {
+                SwitchItem(it.name, globalSettingsStatus[it.setting] ?: false, { state ->
+                    vm.setGlobalSetting(it.setting, state)
+                    globalSettingsStatus[it.setting] = state
+                }, it.icon)
+            }
+            secureSettings.forEach {
+                SwitchItem(it.name, secureSettingsStatus[it.setting] ?: false, { state ->
+                    vm.setSecureSetting(it.setting, state)
+                    secureSettingsStatus[it.setting] = state
+                }, it.icon)
+            }
         }
         if (VERSION.SDK_INT < 34) {
             Row(
-                Modifier.fillMaxWidth().padding(horizontal = HorizontalPadding),
+                Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = HorizontalPadding),
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(stringResource(R.string.status_bar), style = typography.titleMedium)
@@ -597,7 +603,10 @@ fun DefaultInputMethodScreen(
     MyLazyScaffold(R.string.default_input_method, navigateUp) {
         items(imList) { (id, info) ->
             Row(
-                Modifier.fillMaxWidth().clickable { selectedIm = id }.padding(8.dp),
+                Modifier
+                    .fillMaxWidth()
+                    .clickable { selectedIm = id }
+                    .padding(8.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 RadioButton(selectedIm == id, { selectedIm = id })
@@ -613,7 +622,9 @@ fun DefaultInputMethodScreen(
             Button({
                 setIm(selectedIm)
                 context.showOperationResultToast(true)
-            }, Modifier.fillMaxWidth().padding(horizontal = HorizontalPadding)) {
+            }, Modifier
+                .fillMaxWidth()
+                .padding(horizontal = HorizontalPadding)) {
                 Text(stringResource(R.string.apply))
             }
             Spacer(Modifier.height(BottomPadding))
@@ -678,7 +689,9 @@ fun ChangeTimeScreen(setTime: (Long, Boolean) -> Boolean, onNavigateUp: () -> Un
                             value = datePickerState.selectedDateMillis?.let { formatDate(it) } ?: "",
                             onValueChange = {}, readOnly = true,
                             label = { Text(stringResource(R.string.date)) },
-                            modifier = Modifier.fillMaxWidth().clickableTextField { picker = 1 }
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .clickableTextField { picker = 1 }
                         )
                         OutlinedTextField(
                             value = timePickerState.hour.toString().padStart(2, '0') + ":" +
@@ -1678,14 +1691,18 @@ fun SecurityLoggingScreen(
                 val date = SimpleDateFormat("yyyyMMdd", Locale.getDefault()).format(Date())
                 exportLauncher.launch("security_logs_$date")
             },
-            Modifier.fillMaxWidth().padding(horizontal = HorizontalPadding),
+            Modifier
+                .fillMaxWidth()
+                .padding(horizontal = HorizontalPadding),
             logsCount > 0
         ) {
             Text(stringResource(R.string.export_logs))
         }
         if (logsCount > 0) FilledTonalButton(
             { dialog = true },
-            Modifier.fillMaxWidth().padding(HorizontalPadding, 4.dp)
+            Modifier
+                .fillMaxWidth()
+                .padding(HorizontalPadding, 4.dp)
         ) {
             Text(stringResource(R.string.delete_logs))
         }
@@ -1699,7 +1716,9 @@ fun SecurityLoggingScreen(
                     context.showOperationResultToast(false)
                 }
             },
-            modifier = Modifier.fillMaxWidth().padding(HorizontalPadding, 15.dp)
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(HorizontalPadding, 15.dp)
         ) {
             Text(stringResource(R.string.pre_reboot_security_logs))
         }
@@ -1900,7 +1919,9 @@ fun WipeDataScreen(
                     dialog = 1
                 },
                 colors = ButtonDefaults.buttonColors(containerColor = colorScheme.error, contentColor = colorScheme.onError),
-                modifier = Modifier.fillMaxWidth().padding(HorizontalPadding, 5.dp)
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(HorizontalPadding, 5.dp)
             ) {
                 Text("WipeData")
             }
@@ -1912,7 +1933,9 @@ fun WipeDataScreen(
                     dialog = 2
                 },
                 colors = ButtonDefaults.buttonColors(containerColor = colorScheme.error, contentColor = colorScheme.onError),
-                modifier = Modifier.fillMaxWidth().padding(HorizontalPadding, 5.dp)
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(HorizontalPadding, 5.dp)
             ) {
                 Text("WipeDevice")
             }
