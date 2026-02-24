@@ -69,6 +69,7 @@
     <string name="continue_str">继续</string>
     <string name="exit">退出</string>
     <string name="undo">撤销</string>
+    <string name="refresh">刷新</string>
 
     <!--Permissions-->
     <string name="profile_owner">Profile owner</string>
@@ -162,6 +163,7 @@
     <string name="manually_input">手动输入</string>
     <string name="date">日期</string>
     <string name="time">时间</string>
+    <string name="timezone">时区</string>
     <string name="use_current_timezone">使用当前时区</string>
     <string name="change_timezone">更改时区</string>
     <string name="timezone_id">时区ID</string>
@@ -177,7 +179,7 @@
     <string name="nearby_app_streaming">附近应用传输</string>
     <string name="nearby_streaming_policy">附近流式传输策略</string>
     <string name="nearby_notification_streaming">附近通知传输</string>
-    <string name="enable_if_secure_enough">在足够安全时启用</string>
+    <string name="enable_if_same_account">账号相同时启用</string>
     <string name="lock_task_mode">锁定任务模式</string>
     <string name="lock_task_mode_start_clear_task">清除任务（新实例）</string>
     <string name="lock_task_mode_show_notification">显示通知以退出</string>
@@ -219,8 +221,7 @@
     <string name="is_security_patch">安全补丁: %1$s</string>
     <string name="no_system_update">暂无系统更新</string>
     <string name="system_update_policy">系统更新策略</string>
-    <string name="system_update_policy_automatic">准备好后立即更新</string>
-    <string name="system_update_policy_install_windowed">在某段时间里更新</string>
+    <string name="system_update_policy_windowed">窗口期</string>
     <string name="system_update_policy_postpone">延迟30天</string>
     <string name="start_time">开始时间</string>
     <string name="end_time">结束时间</string>
@@ -349,6 +350,8 @@
 
     <!--Applications-->
     <string name="applications">应用程序</string>
+    <string name="apps_view">应用视图</string>
+    <string name="features_view">功能视图</string>
     <string name="show_user_app">显示用户应用</string>
     <string name="show_system_app">显示系统应用</string>
     <string name="suspend">挂起</string>
@@ -705,6 +708,7 @@
     <string name="info_password_history_length">设置后，用户将无法输入与历史记录中任何密码相同的新密码。当前密码将保留，直到用户设置新密码为止，因此更改不会立即生效。值为0表示不做限制。</string>
     <string name="info_required_strong_auth_timeout">如果用户在这段时间内没有使用强认证（密码、PIN或图案）解锁设备，则要求使用强认证解锁设备。值为0表示OwnDroid不参与控制超时。一般来说，最少1小时，最多72小时。</string>
     <string name="info_deactivate">OwnDroid将会丢失特权</string>
+    <string name="info_personal_apps_suspended">你的个人应用被OwnDroid挂起</string>
 
     <string name="choose_work_mode">选择一个工作模式</string>
     <string name="recommended">推荐</string>

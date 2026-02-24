@@ -22,6 +22,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -29,18 +30,20 @@ import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.bintianqi.owndroid.BottomPadding
-import com.bintianqi.owndroid.Privilege
 import com.bintianqi.owndroid.R
-import com.bintianqi.owndroid.SP
-import com.bintianqi.owndroid.adaptiveInsets
 import com.bintianqi.owndroid.ui.navigation.Destination
+import com.bintianqi.owndroid.utils.BottomPadding
+import com.bintianqi.owndroid.utils.PrivilegeStatus
+import com.bintianqi.owndroid.utils.adaptiveInsets
+import kotlinx.coroutines.flow.StateFlow
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun HomeScreen(onNavigate: (Destination) -> Unit) {
-    val privilege by Privilege.status.collectAsStateWithLifecycle()
+fun HomeScreen(
+    privilegeState: StateFlow<PrivilegeStatus>, getAppListViewMode: () -> Boolean,
+    onNavigate: (Destination) -> Unit
+) {
+    val privilege by privilegeState.collectAsState()
     val sb = TopAppBarDefaults.exitUntilCollapsedScrollBehavior()
     Scaffold(
         Modifier.nestedScroll(sb.nestedScrollConnection),
@@ -82,8 +85,8 @@ fun HomeScreen(onNavigate: (Destination) -> Unit) {
             if (privilege.device || privilege.profile) {
                 HomePageItem(R.string.applications, R.drawable.apps_fill0) {
                     onNavigate(
-                        if (SP.applicationsListView) Destination.ApplicationsList(true, true)
-                        else Destination.ApplicationFunctions
+                        if (getAppListViewMode()) Destination.ApplicationsList(true, true)
+                        else Destination.ApplicationFeatures
                     )
                 }
                 if (VERSION.SDK_INT >= 24) {

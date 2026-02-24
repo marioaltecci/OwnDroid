@@ -7,7 +7,8 @@ import androidx.activity.viewModels
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.fragment.app.FragmentActivity
-import com.bintianqi.owndroid.ui.AppInstaller
+import com.bintianqi.owndroid.feature.applications.AppInstaller
+import com.bintianqi.owndroid.feature.applications.AppInstallerViewModel
 import com.bintianqi.owndroid.ui.theme.OwnDroidTheme
 
 class AppInstallerActivity:FragmentActivity() {
@@ -16,14 +17,11 @@ class AppInstallerActivity:FragmentActivity() {
         super.onCreate(savedInstanceState)
         val vm by viewModels<AppInstallerViewModel>()
         vm.initialize(intent)
-        vm.registerInstallerReceiver(this)
-        val theme = ThemeSettings(SP.materialYou, SP.darkTheme, SP.blackTheme)
+        val themeState = (application as MyApplication).container.themeState
         setContent {
+            val theme by themeState.collectAsState()
             OwnDroidTheme(theme) {
-                val uiState by vm.uiState.collectAsState()
-                AppInstaller(
-                    uiState, vm::onPackagesAdd, vm::onPackageRemove, vm::startInstall, vm::closeResultDialog
-                )
+                AppInstaller(vm)
             }
         }
     }

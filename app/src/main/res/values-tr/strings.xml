@@ -191,7 +191,7 @@
     <string name="nearby_app_streaming">Yakındaki Uygulama Akışı</string>
     <string name="nearby_streaming_policy">Yakındaki Akış Politikası</string>
     <string name="nearby_notification_streaming">Yakındaki Bildirim Akışı</string>
-    <string name="enable_if_secure_enough">Yalnızca aynı yönetilen hesap</string>
+    <string name="enable_if_same_account">Yalnızca aynı yönetilen hesap</string>
     <string name="lock_task_mode">Görev Kilitleme Modu</string>
     <string name="app_not_allowed">Uygulamaya izin verilmiyor</string>
     <string name="disable_all">Hepsini Devre Dışı Bırak</string>
@@ -228,8 +228,7 @@
     <string name="is_security_patch">Güvenlik yaması: %1$s</string>
     <string name="no_system_update">Sistem güncellemesi yok</string>
     <string name="system_update_policy">Sistem Güncelleme Politikası</string>
-    <string name="system_update_policy_automatic">Otomatik</string>
-    <string name="system_update_policy_install_windowed">Pencereli Yükleme</string>
+    <string name="system_update_policy_windowed">Pencereli Yükleme</string> <!--TODO-->
     <string name="system_update_policy_postpone">30 Gün Ertele</string>
     <string name="start_time">Başlangıç Zamanı</string>
     <string name="end_time">Bitiş Zamanı</string>

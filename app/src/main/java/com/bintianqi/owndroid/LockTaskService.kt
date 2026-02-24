@@ -11,6 +11,8 @@ import android.os.IBinder
 import androidx.annotation.RequiresApi
 import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat
+import com.bintianqi.owndroid.utils.MyNotificationChannel
+import com.bintianqi.owndroid.utils.NotificationType
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.cancel
@@ -65,11 +67,14 @@ class LockTaskService: Service() {
     }
 
     fun stopLockTask() {
-        val features = Privilege.DPM.getLockTaskFeatures(Privilege.DAR)
-        val packages = Privilege.DPM.getLockTaskPackages(Privilege.DAR)
-        Privilege.DPM.setLockTaskPackages(Privilege.DAR, arrayOf())
-        Privilege.DPM.setLockTaskPackages(Privilege.DAR, packages)
-        Privilege.DPM.setLockTaskFeatures(Privilege.DAR, features)
+        val ph = (application as MyApplication).container.privilegeHelper
+        ph.safeDpmCall {
+            val features = dpm.getLockTaskFeatures(dar)
+            val packages = dpm.getLockTaskPackages(dar)
+            dpm.setLockTaskPackages(dar, arrayOf())
+            dpm.setLockTaskPackages(dar, packages)
+            dpm.setLockTaskFeatures(dar, features)
+        }
     }
 
     companion object {

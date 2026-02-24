@@ -89,6 +89,7 @@ gradle.taskGraph.whenReady {
 dependencies {
     implementation(libs.androidx.activity.compose)
     implementation(platform(libs.androidx.compose.bom))
+    implementation(libs.androidx.lifecycle.viewmodel)
     implementation(libs.androidx.nav3.runtime)
     implementation(libs.androidx.nav3.ui)
     implementation(libs.androidx.compose.ui.tooling.preview)

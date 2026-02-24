@@ -31,46 +31,92 @@ import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.LocalLifecycleOwner
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation3.runtime.rememberNavBackStack
+import androidx.navigation3.runtime.rememberSaveableStateHolderNavEntryDecorator
 import androidx.navigation3.ui.NavDisplay
-import com.bintianqi.owndroid.dpm.dhizukuErrorStatus
+import com.bintianqi.owndroid.feature.applications.AppChooserViewModel
 import com.bintianqi.owndroid.ui.NavTransition
 import com.bintianqi.owndroid.ui.navigation.Destination
 import com.bintianqi.owndroid.ui.navigation.myEntryProvider
+import com.bintianqi.owndroid.ui.navigation.rememberSharedViewModelStoreNavEntryDecorator
+import com.bintianqi.owndroid.ui.screen.AppLockDialog
 import com.bintianqi.owndroid.ui.theme.OwnDroidTheme
-import java.util.Locale
+import com.bintianqi.owndroid.utils.DhizukuError
+import com.bintianqi.owndroid.utils.popToast
+import com.bintianqi.owndroid.utils.registerPackageRemovedReceiver
+import com.bintianqi.owndroid.utils.viewModelFactory
+import kotlinx.coroutines.launch
 
 @ExperimentalMaterial3Api
 class MainActivity : FragmentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         enableEdgeToEdge()
         super.onCreate(savedInstanceState)
-        val context = applicationContext
-        val locale = context.resources?.configuration?.locale
-        zhCN = locale == Locale.SIMPLIFIED_CHINESE || locale == Locale.CHINESE || locale == Locale.CHINA
-        val vm by viewModels<MyViewModel>()
+        val context = this
+        val myApp = (application as MyApplication)
+        val settingsRepo = myApp.container.settingsRepo
         if (
             VERSION.SDK_INT >= 33 &&
-            checkSelfPermission(Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED
+            checkSelfPermission(
+                Manifest.permission.POST_NOTIFICATIONS
+            ) != PackageManager.PERMISSION_GRANTED
         ) {
             val launcher = registerForActivityResult(ActivityResultContracts.RequestPermission()) {}
             launcher.launch(Manifest.permission.POST_NOTIFICATIONS)
         }
+        val appChooserVm: AppChooserViewModel by viewModels(
+            factoryProducer = {
+                viewModelFactory { AppChooserViewModel(myApp) }
+            }
+        )
         registerPackageRemovedReceiver(this) {
-            vm.onPackageRemoved(it)
+            appChooserVm.onPackageRemoved(it)
+        }
+        if (
+            myApp.container.privilegeState.value.work &&
+            !settingsRepo.data.privilege.managedProfileActivated
+        ) {
+            myApp.container.privilegeHelper.dpm.setProfileEnabled(
+                myApp.container.privilegeHelper.dar
+            )
+            settingsRepo.update {
+                it.privilege.managedProfileActivated = true
+            }
+            context.popToast(R.string.work_profile_activated)
+        }
+        lifecycleScope.launch {
+            while (true) {
+                val text = myApp.container.toastChannel.channel.receive()
+                context.popToast(text)
+            }
         }
         setContent {
+            val dhizukuError by myApp.container.dhizukuErrorState.collectAsState()
             var appLockDialog by rememberSaveable { mutableStateOf(false) }
-            val theme by vm.theme.collectAsStateWithLifecycle()
+            val theme by myApp.container.themeState.collectAsState()
             OwnDroidTheme(theme) {
-                Box(Modifier.fillMaxSize().background(MaterialTheme.colorScheme.background))
+                Box(
+                    Modifier
+                        .fillMaxSize()
+                        .background(MaterialTheme.colorScheme.background)
+                )
                 val backstack = rememberNavBackStack(Destination.Home)
+                LaunchedEffect(Unit) {
+                    if (!myApp.container.privilegeState.value.activated) {
+                        backstack.add(Destination.WorkingModes(false))
+                        backstack.removeFirstOrNull()
+                    }
+                }
                 NavDisplay(
                     backstack,
                     onBack = {
                         backstack.removeLastOrNull()
                     },
+                    entryDecorators = listOf(
+                        rememberSaveableStateHolderNavEntryDecorator(),
+                        rememberSharedViewModelStoreNavEntryDecorator()
+                    ),
                     transitionSpec = {
                         NavTransition.transition
                     },
@@ -81,17 +127,21 @@ class MainActivity : FragmentActivity() {
                         NavTransition.popTransition
                     }
                 ) {
-                    myEntryProvider(it as Destination, backstack, vm)
+                    myEntryProvider(it as Destination, backstack, appChooserVm, myApp.container)
                 }
                 val lifecycleOwner = LocalLifecycleOwner.current
                 if (appLockDialog) {
-                    AppLockDialog({ appLockDialog = false }) { moveTaskToBack(true) }
+                    AppLockDialog(
+                        myApp.container.settingsRepo.data.appLock, { appLockDialog = false }
+                    ) { moveTaskToBack(true) }
                 }
                 DisposableEffect(lifecycleOwner) {
                     val observer = LifecycleEventObserver { _, event ->
                         if (
-                            (event == Lifecycle.Event.ON_CREATE && !SP.lockPasswordHash.isNullOrEmpty()) ||
-                            (event == Lifecycle.Event.ON_RESUME && SP.lockWhenLeaving)
+                            settingsRepo.data.appLock.passwordHash.isNotEmpty() &&
+                            (event == Lifecycle.Event.ON_CREATE ||
+                                    (event == Lifecycle.Event.ON_RESUME &&
+                                            settingsRepo.data.appLock.lockWhenLeaving))
                         ) {
                             appLockDialog = true
                         }
@@ -101,21 +151,12 @@ class MainActivity : FragmentActivity() {
                         lifecycleOwner.lifecycle.removeObserver(observer)
                     }
                 }
-                LaunchedEffect(Unit) {
-                    val profileNotActivated = !SP.managedProfileActivated && Privilege.status.value.work
-                    if(profileNotActivated) {
-                        Privilege.DPM.setProfileEnabled(Privilege.DAR)
-                        SP.managedProfileActivated = true
-                        context.popToast(R.string.work_profile_activated)
-                    }
-                }
-                DhizukuErrorDialog {
-                    dhizukuErrorStatus.value = 0
-                    Privilege.updateStatus()
-                    backstack += Destination.WorkingModes(false)
+                if (dhizukuError != null) DhizukuErrorDialog(dhizukuError!!) {
+                    myApp.container.dhizukuErrorState.value = null
+                    /*backstack += Destination.WorkingModes(false)
                     repeat(backstack.size - 1) {
                         backstack.removeFirstOrNull()
-                    }
+                    }*/
                 }
             }
         }
@@ -123,31 +164,25 @@ class MainActivity : FragmentActivity() {
 }
 
 @Composable
-private fun DhizukuErrorDialog(onClose: () -> Unit) {
-    val status by dhizukuErrorStatus.collectAsState()
-    if (status != 0) {
-        LaunchedEffect(Unit) {
-            SP.dhizuku = false
-        }
-        AlertDialog(
-            onDismissRequest = {},
-            confirmButton = {
-                TextButton(onClose) {
-                    Text(stringResource(R.string.confirm))
+private fun DhizukuErrorDialog(error: DhizukuError, onClose: () -> Unit) {
+    AlertDialog(
+        onDismissRequest = {},
+        confirmButton = {
+            TextButton(onClose) {
+                Text(stringResource(R.string.confirm))
+            }
+        },
+        title = { Text(stringResource(R.string.dhizuku)) },
+        text = {
+            val text = stringResource(
+                when (error) {
+                    DhizukuError.Init -> R.string.failed_to_init_dhizuku
+                    DhizukuError.Permission -> R.string.dhizuku_permission_not_granted
+                    else -> R.string.failed_to_init_dhizuku
                 }
-            },
-            title = { Text(stringResource(R.string.dhizuku)) },
-            text = {
-                val text = stringResource(
-                    when(status){
-                        1 -> R.string.failed_to_init_dhizuku
-                        2 -> R.string.dhizuku_permission_not_granted
-                        else -> R.string.failed_to_init_dhizuku
-                    }
-                )
-                Text(text)
-            },
-            properties = DialogProperties(dismissOnBackPress = false, dismissOnClickOutside = false)
-        )
-    }
+            )
+            Text(text)
+        },
+        properties = DialogProperties(dismissOnBackPress = false, dismissOnClickOutside = false)
+    )
 }

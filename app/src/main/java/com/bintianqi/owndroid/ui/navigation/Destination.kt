@@ -4,14 +4,16 @@ import androidx.navigation3.runtime.NavKey
 import kotlinx.serialization.Serializable
 
 sealed class Destination : NavKey {
+    override fun toString(): String {
+        return this::class.simpleName!!
+    }
+
     @Serializable object Home : Destination()
 
     @Serializable class WorkingModes(val canNavigateUp: Boolean) : Destination()
     @Serializable object DhizukuServerSettings : Destination()
     @Serializable object DelegatedAdmins : Destination()
-    @Serializable class DelegatedAdminDetails(
-        val pkg: String, val scopes: List<String>
-    ) : Destination()
+    @Serializable object DelegatedAdminDetails : Destination()
 
     @Serializable object TransferOwnership : Destination()
 
@@ -20,10 +22,7 @@ sealed class Destination : NavKey {
     @Serializable object Keyguard : Destination()
     @Serializable object HardwareMonitor : Destination()
     @Serializable object DefaultInputMethod : Destination()
-    @Serializable object ChangeTime : Destination()
-    @Serializable object ChangeTimezone : Destination()
-    @Serializable object AutoTimePolicy : Destination()
-    @Serializable object AutoTimezonePolicy : Destination()
+    @Serializable object Time : Destination()
     @Serializable object ContentProtectionPolicy : Destination()
     @Serializable object PermissionPolicy : Destination()
     @Serializable object MtePolicy : Destination()
@@ -53,18 +52,17 @@ sealed class Destination : NavKey {
     @Serializable object RecommendedGlobalProxy : Destination()
     @Serializable object NetworkLogging : Destination()
     @Serializable object PreferentialNetworkService : Destination()
-    @Serializable class AddPreferentialNetworkServiceConfig(val index: Int) : Destination()
+    @Serializable object AddPreferentialNetworkServiceConfig : Destination()
     @Serializable object OverrideApn : Destination()
-    @Serializable data class AddApnSetting(val index: Int) : Destination()
+    @Serializable object AddApnSetting : Destination()
 
     @Serializable object WorkProfile : Destination()
     @Serializable object CreateWorkProfile : Destination()
-    @Serializable object OrganizationOwnedProfile : Destination()
     @Serializable object SuspendPersonalApp : Destination()
     @Serializable object CrossProfileIntentFilter : Destination()
     @Serializable object DeleteWorkProfile : Destination()
 
-    @Serializable object ApplicationFunctions : Destination()
+    @Serializable object ApplicationFeatures : Destination()
     @Serializable object Suspend : Destination()
     @Serializable object Hide : Destination()
     @Serializable object BlockUninstall : Destination()
@@ -83,10 +81,8 @@ sealed class Destination : NavKey {
     @Serializable object PermittedInputMethods : Destination()
     @Serializable object EnableSystemApp : Destination()
     @Serializable object SetDefaultDialer : Destination()
-    @Serializable object ManageAppGroups : Destination()
-    @Serializable class EditAppGroup(
-        val id: Int?, val name: String, val apps: List<String>
-    ) : Destination()
+    @Serializable object AppGroups : Destination()
+    @Serializable object EditAppGroup : Destination()
 
     @Serializable class ApplicationDetails(val packageName: String) : Destination()
     @Serializable class AppPermissionsManager(val packageName: String) : Destination()
