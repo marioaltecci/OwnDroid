@@ -372,7 +372,12 @@
     <string name="personal_app_suspended_because_timeout">Personal app suspended because of this: %1$s</string>
     <string name="intent_filter">Intent filter</string>
     <string name="presets">Presets</string>
-    <string name="allow_file_sharing">Allow file sharing</string>
+    <string name="open_file">Open file</string>
+    <string name="share">Share</string>
+    <string name="share_multiple">Share (multiple)</string>
+    <string name="get_content">Get content</string>
+    <string name="choose_file">Choose file</string>
+    <string name="choose_folder">Choose folder</string>
     <string name="direction">Direction</string>
     <string name="both_direction">Both direction</string>
     <string name="work_to_personal">Work to personal</string>

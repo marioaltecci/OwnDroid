@@ -10,14 +10,20 @@ import androidx.fragment.app.FragmentActivity
 import com.bintianqi.owndroid.feature.applications.AppInstaller
 import com.bintianqi.owndroid.feature.applications.AppInstallerViewModel
 import com.bintianqi.owndroid.ui.theme.OwnDroidTheme
+import com.bintianqi.owndroid.utils.viewModelFactory
 
-class AppInstallerActivity:FragmentActivity() {
+class AppInstallerActivity : FragmentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         enableEdgeToEdge()
         super.onCreate(savedInstanceState)
-        val vm by viewModels<AppInstallerViewModel>()
+        val myApp = application as MyApplication
+        val vm by viewModels<AppInstallerViewModel> {
+            viewModelFactory {
+                AppInstallerViewModel(myApp, myApp.container.settingsRepo)
+            }
+        }
         vm.initialize(intent)
-        val themeState = (application as MyApplication).container.themeState
+        val themeState = myApp.container.themeState
         setContent {
             val theme by themeState.collectAsState()
             OwnDroidTheme(theme) {

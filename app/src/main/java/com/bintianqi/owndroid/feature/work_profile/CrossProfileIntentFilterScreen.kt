@@ -2,6 +2,7 @@ package com.bintianqi.owndroid.feature.work_profile
 
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -9,11 +10,13 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
@@ -26,6 +29,7 @@ import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -39,6 +43,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -46,17 +51,17 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import com.bintianqi.owndroid.R
+import com.bintianqi.owndroid.ui.MyLazyScaffold
 import com.bintianqi.owndroid.ui.NavIcon
 import com.bintianqi.owndroid.ui.Notes
 import com.bintianqi.owndroid.utils.BottomPadding
 import com.bintianqi.owndroid.utils.HorizontalPadding
 import com.bintianqi.owndroid.utils.adaptiveInsets
 
-
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CrossProfileIntentFilterScreen(
-    vm: CrossProfileIntentFilterViewModel, onNavigateUp: () -> Unit
+    vm: CrossProfileIntentFilterViewModel, onNavigateUp: () -> Unit, navigateToPresets: () -> Unit
 ) {
     val focusMgr = LocalFocusManager.current
     var action by remember { mutableStateOf("") }
@@ -66,7 +71,6 @@ fun CrossProfileIntentFilterScreen(
     var mimeType by remember { mutableStateOf("") }
     var dropdown by remember { mutableStateOf(false) }
     var direction by remember { mutableIntStateOf(3) }
-    var dialog by remember { mutableStateOf(false) }
     val importLauncher = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) {
         if (it != null) vm.importFilters(it)
     }
@@ -90,7 +94,7 @@ fun CrossProfileIntentFilterScreen(
                             DropdownMenuItem(
                                 { Text(stringResource(R.string.presets)) },
                                 {
-                                    dialog = true
+                                    navigateToPresets()
                                     menu = false
                                 },
                                 leadingIcon = {
@@ -124,11 +128,6 @@ fun CrossProfileIntentFilterScreen(
         },
         contentWindowInsets = adaptiveInsets()
     ) { paddingValues ->
-        val directionTextMap = mapOf(
-            1 to R.string.personal_to_work,
-            2 to R.string.work_to_personal,
-            3 to R.string.both_direction
-        )
         Column(
             Modifier
                 .padding(paddingValues)
@@ -205,24 +204,82 @@ fun CrossProfileIntentFilterScreen(
             Notes(R.string.info_cross_profile_intent_filter)
             Spacer(Modifier.height(BottomPadding))
         }
-        if (dialog) AlertDialog(
-            title = { Text(stringResource(R.string.presets)) },
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun CrossProfileIntentFilterPresetsScreen(
+    vm: CrossProfileIntentFilterViewModel, navigateUp: () -> Unit
+) {
+    var dialog by remember { mutableStateOf<IntentFilterPreset?>(null) }
+    MyLazyScaffold(R.string.presets, navigateUp) {
+        items(crossProfileIntentFilterPresets) {
+            Row(
+                Modifier.padding(start = HorizontalPadding, end = 8.dp, bottom = 2.dp),
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                Column(Modifier.weight(1F)) {
+                    Text(stringResource(it.name))
+                    Text(
+                        it.action,
+                        Modifier.alpha(0.7F),
+                        style = MaterialTheme.typography.bodyMedium
+                    )
+                }
+                IconButton({ dialog = it }) {
+                    Icon(Icons.Default.Add, null)
+                }
+            }
+        }
+    }
+    if (dialog != null) {
+        var direction by remember { mutableIntStateOf(3) }
+        AlertDialog(
+            title = {
+                Text(stringResource(dialog!!.name))
+            },
             text = {
-                crossProfileIntentFilterPresets.forEach {
-                    Button({
-                        vm.addFilter(it.value)
-                        dialog = false
-                    }) {
-                        Text(stringResource(it.key))
+                Column {
+                    var dropdown by remember { mutableStateOf(false) }
+                    Text(dialog!!.action)
+                    ExposedDropdownMenuBox(
+                        dropdown, { dropdown = it }, Modifier.padding(top = 5.dp)
+                    ) {
+                        OutlinedTextField(
+                            stringResource(directionTextMap[direction]!!), {},
+                            Modifier
+                                .menuAnchor(ExposedDropdownMenuAnchorType.PrimaryNotEditable)
+                                .fillMaxWidth(),
+                            textStyle = MaterialTheme.typography.bodyLarge,
+                            label = { Text(stringResource(R.string.direction)) }, readOnly = true,
+                            trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(dropdown) }
+                        )
+                        ExposedDropdownMenu(dropdown, { dropdown = false }) {
+                            directionTextMap.forEach {
+                                DropdownMenuItem({ Text(stringResource(it.value)) }, {
+                                    direction = it.key
+                                    dropdown = false
+                                })
+                            }
+                        }
                     }
                 }
             },
             confirmButton = {
-                TextButton({ dialog = false }) {
+                TextButton({
+                    vm.addPreset(dialog!!, direction)
+                    dialog = null
+                }) {
+                    Text(stringResource(R.string.confirm))
+                }
+            },
+            dismissButton = {
+                TextButton({ dialog = null }) {
                     Text(stringResource(R.string.cancel))
                 }
             },
-            onDismissRequest = { dialog = false }
+            onDismissRequest = { dialog = null }
         )
     }
 }

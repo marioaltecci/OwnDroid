@@ -233,9 +233,11 @@ fun uninstallPackage(
     val receiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent) {
             val statusExtra = intent.getIntExtra(PackageInstaller.EXTRA_STATUS, 999)
-            if(statusExtra == PackageInstaller.STATUS_PENDING_USER_ACTION) {
+            if (statusExtra == PackageInstaller.STATUS_PENDING_USER_ACTION) {
                 @SuppressWarnings("UnsafeIntentLaunch")
-                context.startActivity(intent.getParcelableExtra(Intent.EXTRA_INTENT) as Intent?)
+                val confirmIntent = intent.getParcelableExtra<Intent>(Intent.EXTRA_INTENT)
+                confirmIntent?.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                context.startActivity(confirmIntent)
             } else {
                 context.unregisterReceiver(this)
                 if (statusExtra == PackageInstaller.STATUS_SUCCESS) {

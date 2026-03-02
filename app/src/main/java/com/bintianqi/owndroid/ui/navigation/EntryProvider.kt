@@ -95,6 +95,7 @@ import com.bintianqi.owndroid.feature.users.UserSessionMessageScreen
 import com.bintianqi.owndroid.feature.users.UsersOptionsScreen
 import com.bintianqi.owndroid.feature.users.UsersScreen
 import com.bintianqi.owndroid.feature.work_profile.CreateWorkProfileScreen
+import com.bintianqi.owndroid.feature.work_profile.CrossProfileIntentFilterPresetsScreen
 import com.bintianqi.owndroid.feature.work_profile.CrossProfileIntentFilterScreen
 import com.bintianqi.owndroid.feature.work_profile.DeleteWorkProfileScreen
 import com.bintianqi.owndroid.feature.work_profile.SuspendPersonalAppScreen
@@ -360,7 +361,14 @@ fun myEntryProvider(
     entry<Destination.CrossProfileIntentFilter> {
         CrossProfileIntentFilterScreen(
             viewModel(factory = container.viewModelFactory), ::navigateUp
-        )
+        ) {
+            navigate(Destination.CrossProfileIntentFilterPresets)
+        }
+    }
+    entry<Destination.CrossProfileIntentFilterPresets>(
+        metadata = navParentKey(Destination.CrossProfileIntentFilter)
+    ) {
+        CrossProfileIntentFilterPresetsScreen(viewModel(), ::navigateUp)
     }
     entry<Destination.DeleteWorkProfile>(
         metadata = navParentKey(Destination.WorkProfile)

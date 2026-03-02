@@ -25,6 +25,10 @@ class CrossProfileIntentFilterViewModel(
         toastChannel.sendStatus(true)
     }
 
+    fun addPreset(preset: IntentFilterPreset, direction: Int) {
+        addFilter(IntentFilterOptions(preset.action, preset.category, preset.mimeType, direction))
+    }
+
     fun clearFilters() = ph.safeDpmCall {
         dpm.clearCrossProfileIntentFilters(dar)
         repo.deleteAllCrossProfileIntentFilters()
