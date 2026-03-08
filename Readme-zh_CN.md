@@ -99,7 +99,9 @@ pm set-user-restriction no_add_clone_profile 0
 一些系统在设置了device owner后不允许在安卓设置中创建用户，你可以在OwnDroid中创建用户。
 如果你有root，你也可以在adb shell中运行以上命令以解除限制。
 
-## API
+## 高级用户
+
+### API
 
 OwnDroid提供了一个基于Intent的API。你需要在设置中设置密钥并启用API。括号中的数字是最小的安卓版本。
 
@@ -137,7 +139,9 @@ context.sendBroadcast(intent)
 
 [可用的用户限制](https://developer.android.google.cn/reference/android/os/UserManager#constants_1)
 
-## 构建
+## 开发者
+
+### 构建
 
 你可以在命令行中使用Gradle以构建OwnDroid
 ```shell
@@ -147,6 +151,10 @@ context.sendBroadcast(intent)
 ./gradlew build -PStoreFile="/path/to/your/jks/file" -PStorePassword="YOUR_KEYSTORE_PASSWORD" -PKeyPassword="YOUR_KEY_PASSWORD" -PKeyAlias="YOUR_KEY_ALIAS"
 ```
 （在Windows系统中应使用`./gradlew.bat`)
+
+### 贡献
+
+请使用`dev`分支。
 
 ## 许可证
 

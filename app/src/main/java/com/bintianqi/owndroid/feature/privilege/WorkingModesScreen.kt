@@ -93,7 +93,7 @@ fun WorkModesScreen(
                         Column {
                             Text(stringResource(R.string.app_name))
                             Text(
-                                stringResource(R.string.choose_work_mode), Modifier.alpha(0.8F),
+                                stringResource(R.string.choose_working_mode), Modifier.alpha(0.8F),
                                 style = typography.bodyLarge
                             )
                         }

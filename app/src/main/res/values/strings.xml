@@ -752,7 +752,7 @@
     <string name="info_deactivate">OwnDroid will lost its privilege</string>
     <string name="info_personal_apps_suspended">Your personal apps is suspended by OwnDroid</string>
 
-    <string name="choose_work_mode">Choose a work mode</string>
+    <string name="choose_working_mode">Choose a working mode</string>
     <string name="recommended">Recommended</string>
     <string name="activate_method">Activate method</string>
     <string name="adb_command">ADB command</string>

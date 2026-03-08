@@ -685,7 +685,7 @@
     <string name="info_required_strong_auth_timeout">Son güçlü kimlik doğrulama yönteminin (parola, PIN veya desen) kullanıldığından beri kullanıcının ikincil, güçlü olmayan kimlik doğrulamayı ne kadar süre kullanabileceğini belirler. Dönen zaman aşımından sonra kullanıcı güçlü kimlik doğrulama yöntemi kullanmak zorundadır.\n0 değeri, yöneticinin zaman aşımı kontrolüne katılmadığı anlamına gelir. Minimum ve maksimum zaman aşımı süreleri platform tarafından tanımlanır ve genellikle sırasıyla 1 saat ve 72 saattir.</string>
     <string name="info_deactivate">OwnDroid yetkilerini kaybedecektir.</string>
 
-    <string name="choose_work_mode">Çalışma Modunu Seç</string>
+    <string name="choose_working_mode">Çalışma Modunu Seç</string>
     <string name="recommended">Önerilen</string>
     <string name="activate_method">Etkinleştirme Yöntemi</string>
     <string name="adb_command">ADB Komutu</string>

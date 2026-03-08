@@ -715,7 +715,7 @@
     <string name="info_deactivate">OwnDroid将会丢失特权</string>
     <string name="info_personal_apps_suspended">你的个人应用被OwnDroid挂起</string>
 
-    <string name="choose_work_mode">选择一个工作模式</string>
+    <string name="choose_working_mode">选择一个工作模式</string>
     <string name="recommended">推荐</string>
     <string name="activate_method">激活方法</string>
     <string name="adb_command">ADB命令</string>

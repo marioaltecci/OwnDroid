@@ -101,7 +101,9 @@ pm set-user-restriction no_add_clone_profile 0
 Some systems disable the feature of adding users in Android settings once a device owner is set.
 You have to create users in OwnDroid. Or if you have root, run the above command in adb shell to remove that restriction.
 
-## API
+## For advanced users
+
+### API
 
 OwnDroid provides an Intent-based API. You need to set the API key in settings and enable the API. The numbers in brackets represent the minimum Android version required.
 
@@ -139,7 +141,9 @@ context.sendBroadcast(intent)
 
 [Available user restrictions](https://developer.android.com/reference/android/os/UserManager#constants_1)
 
-## Build
+## For developers
+
+### Build
 
 You can use Gradle in command line to build OwnDroid.
 ```shell
@@ -149,6 +153,10 @@ You can use Gradle in command line to build OwnDroid.
 ./gradlew build -PStoreFile="/path/to/your/jks/file" -PStorePassword="YOUR_KEYSTORE_PASSWORD" -PKeyPassword="YOUR_KEY_PASSWORD" -PKeyAlias="YOUR_KEY_ALIAS"
 ```
 (Use `./gradlew.bat` instead on Windows)
+
+### Contribute
+
+Please use the `dev` branch.
 
 ## License
 
