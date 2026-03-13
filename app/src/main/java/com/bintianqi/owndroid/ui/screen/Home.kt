@@ -1,5 +1,9 @@
 package com.bintianqi.owndroid.ui.screen
 
+import androidx.compose.material3.Card
+import androidx.compose.foundation.layout.width
+import androidx.compose.ui.unit.dp
+import androidx.compose.foundation.layout.*
 import android.os.Build.VERSION
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
