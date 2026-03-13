@@ -108,16 +108,31 @@ fun HomeScreen(
 
 @Composable
 fun HomePageItem(name: Int, icon: Int, onClick: () -> Unit) {
-    Row(
-        Modifier
+
+    Card(
+        modifier = Modifier
             .fillMaxWidth()
+            .padding(horizontal = 16.dp, vertical = 6.dp)
             .clickable(onClick = onClick)
-            .padding(vertical = 12.dp),
-        verticalAlignment = Alignment.CenterVertically
     ) {
-        Spacer(Modifier.padding(start = 30.dp))
-        Icon(painterResource(icon), null)
-        Spacer(Modifier.padding(start = 15.dp))
-        Text(stringResource(name), style = typography.headlineSmall)
+
+        Row(
+            Modifier
+                .padding(16.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+
+            Icon(
+                painterResource(icon),
+                contentDescription = null
+            )
+
+            Spacer(Modifier.width(16.dp))
+
+            Text(
+                stringResource(name),
+                style = typography.headlineSmall
+            )
+        }
     }
 }
